@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026跨年表白</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        /* 音乐控制按钮 */
+        .music-btn {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(255, 107, 157, 0.3);
+            border: 2px solid rgba(255, 107, 157, 0.6);
+            color: #ff6b9d;
+            font-size: 1.3rem;
+            cursor: pointer;
+            z-index: 500;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s;
+            backdrop-filter: blur(5px);
+        }
+        
+        .music-btn:hover {
+            background: rgba(255, 107, 157, 0.5);
+            transform: scale(1.1);
+        }
+        
+        .music-btn.playing {
+            animation: musicPulse 1s ease-in-out infinite;
+        }
+        
+        @keyframes musicPulse {
+            0%, 100% { box-shadow: 0 0 10px rgba(255, 107, 157, 0.5); }
+            50% { box-shadow: 0 0 25px rgba(255, 107, 157, 0.8); }
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 50%, #1a0a2e 100%);
+            color: white;
+            min-height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .stars {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s infinite;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        
+        /* 倒计时页面 */
+        .countdown-page {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+        
+        .countdown-page.hidden { display: none; }
+        
+        .year-title {
+            font-size: 4rem;
+            color: #ff6b9d;
+            text-shadow: 0 0 30px rgba(255, 107, 157, 0.8);
+            margin-bottom: 30px;
+        }
+        
+        .countdown-display {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .time-box {
+            background: rgba(255, 107, 157, 0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 107, 157, 0.5);
+            border-radius: 15px;
+            padding: 20px 25px;
+            text-align: center;
+            min-width: 90px;
+        }
+        
+        .time-value {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #ff6b9d;
+        }
+        
+        .time-label {
+            font-size: 1rem;
+            color: rgba(255,255,255,0.8);
+            margin-top: 5px;
+        }
+        
+        /* 最后10秒大倒计时 */
+        .final-countdown {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 20rem;
+            font-weight: bold;
+            color: #ff6b9d;
+            text-shadow: 0 0 100px rgba(255, 107, 157, 1);
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .final-countdown.show {
+            animation: countPulse 1s ease-out forwards;
+        }
+        
+        @keyframes countPulse {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+            30% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        /* 2026新年显示 */
+        .new-year {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 10rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff6b9d, #ff8a80, #ffab91, #ff6b9d);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            z-index: 90;
+            opacity: 0;
+            animation: gradient 2s ease infinite;
+        }
+        
+        .new-year.show {
+            animation: yearShow 1.5s ease forwards, gradient 2s ease infinite;
+        }
+        
+        .new-year.move-up {
+            animation: moveUp 1s ease forwards, gradient 2s ease infinite;
+        }
+        
+        @keyframes yearShow {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+        
+        @keyframes moveUp {
+            to { top: 5%; font-size: 3rem; opacity: 1; transform: translate(-50%, 0); }
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* 祝福弹窗 */
+        .blessing-popup {
+            position: fixed;
+            background: linear-gradient(135deg, rgba(255, 107, 157, 0.25), rgba(255, 138, 128, 0.25));
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 107, 157, 0.4);
+            border-radius: 10px;
+            padding: 6px 10px;
+            z-index: 50;
+            opacity: 0;
+            transform: scale(0);
+            animation: popIn 0.4s ease forwards;
+            box-shadow: 0 3px 15px rgba(255, 107, 157, 0.3);
+            text-align: center;
+        }
+        
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0); }
+            70% { transform: scale(1.1); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        
+        .blessing-popup .emoji { font-size: 1.1rem; }
+        .blessing-popup .text { font-size: 0.7rem; color: #ffb6c1; font-weight: bold; display: block; }
+        
+        /* 烟花 */
+        .firework { position: fixed; pointer-events: none; z-index: 60; }
+        .firework-particle { position: absolute; width: 5px; height: 5px; border-radius: 50%; }
+        
+        /* 爱心飘落 */
+        .heart-rain {
+            position: fixed;
+            font-size: 1.5rem;
+            z-index: 40;
+            pointer-events: none;
+            animation: heartFall linear forwards;
+        }
+        
+        @keyframes heartFall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0.3; }
+        }
+
+        /* 表白弹窗 */
+        .proposal-modal {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+        }
+        
+        .proposal-modal.show { display: flex; }
+        
+        .proposal-box {
+            background: linear-gradient(135deg, #2d1b4e, #1a0a2e);
+            border: 3px solid #ff6b9d;
+            border-radius: 30px;
+            padding: 40px;
+            text-align: center;
+            max-width: 450px;
+            box-shadow: 0 0 50px rgba(255, 107, 157, 0.5);
+            animation: proposalIn 0.5s ease;
+        }
+        
+        @keyframes proposalIn {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        .proposal-box h2 { font-size: 1.8rem; color: #ff6b9d; margin-bottom: 15px; }
+        .proposal-box .question { font-size: 1.5rem; color: white; margin: 25px 0; line-height: 1.6; }
+        .proposal-box .question .highlight { color: #ff6b9d; font-weight: bold; }
+        
+        .proposal-buttons { display: flex; gap: 25px; justify-content: center; margin-top: 25px; }
+        
+        .btn-yes, .btn-no {
+            padding: 12px 40px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        
+        .btn-yes {
+            background: linear-gradient(45deg, #ff6b9d, #ff8a80);
+            color: white;
+            box-shadow: 0 5px 20px rgba(255, 107, 157, 0.5);
+        }
+        
+        .btn-yes:hover { transform: scale(1.1); }
+        .btn-no { background: #666; color: white; }
+        .reject-message { color: #ffb6c1; font-size: 1.1rem; margin-top: 15px; min-height: 25px; }
+        
+        /* 成功页面 */
+        .success-page {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 50%, #1a0a2e 100%);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 300;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .success-page.show { display: flex; }
+        
+        .success-stars, .floating-hearts {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        
+        .success-content {
+            text-align: center;
+            z-index: 10;
+            animation: successFadeIn 1s ease forwards;
+        }
+        
+        @keyframes successFadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .big-heart { font-size: 6rem; animation: heartFloat 2s ease-in-out infinite; display: inline-block; }
+        
+        @keyframes heartFloat {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-15px) scale(1.1); }
+        }
+        
+        .success-title {
+            font-size: 3rem;
+            background: linear-gradient(45deg, #ff6b9d, #ff8a80, #ffab91, #f48fb1);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradient 3s ease infinite;
+            margin: 15px 0;
+        }
+        
+        .success-box {
+            background: rgba(255, 107, 157, 0.15);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255, 107, 157, 0.4);
+            border-radius: 25px;
+            padding: 30px 50px;
+            margin-top: 20px;
+            max-width: 550px;
+        }
+        
+        .success-box p { font-size: 1.2rem; color: rgba(255,255,255,0.95); line-height: 2; margin: 8px 0; }
+        .success-box .highlight { color: #ff6b9d; font-weight: bold; }
+        
+        .together-date {
+            display: inline-block;
+            background: linear-gradient(45deg, #ff6b9d, #ff8a80);
+            padding: 10px 25px;
+            border-radius: 50px;
+            margin-top: 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        
+        .love-promise { margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,107,157,0.3); }
+        .love-promise p { font-size: 1.1rem; color: #ffb6c1; font-style: italic; }
+        
+        .wechat-tip {
+            margin-top: 25px;
+            padding: 15px 25px;
+            background: rgba(7, 193, 96, 0.2);
+            border: 2px solid rgba(7, 193, 96, 0.5);
+            border-radius: 15px;
+            color: #7fff7f;
+        }
+        
+        .wechat-tip p { color: #7fff7f; font-size: 1rem; }
+        
+        .floating-heart {
+            position: absolute;
+            font-size: 2rem;
+            animation: floatUp 4s ease-in-out infinite;
+            opacity: 0.7;
+        }
+        
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.7; }
+            90% { opacity: 0.7; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+
+        /* 平板适配 */
+        @media (max-width: 768px) {
+            .year-title { font-size: 2.2rem; }
+            .countdown-display { gap: 10px; }
+            .time-box { padding: 15px; min-width: 65px; }
+            .time-value { font-size: 1.8rem; }
+            .final-countdown { font-size: 10rem; }
+            .new-year { font-size: 4rem; }
+            .new-year.move-up { font-size: 1.8rem; }
+            .blessing-popup { padding: 3px 5px; }
+            .blessing-popup .emoji { font-size: 0.8rem; }
+            .blessing-popup .text { font-size: 0.5rem; }
+            .proposal-box { padding: 25px; margin: 15px; }
+            .proposal-box h2 { font-size: 1.4rem; }
+            .proposal-box .question { font-size: 1.2rem; }
+            .btn-yes, .btn-no { padding: 10px 30px; font-size: 1rem; }
+            .big-heart { font-size: 4rem; }
+            .success-title { font-size: 1.8rem; }
+            .success-box { padding: 20px 25px; margin: 0 15px; }
+            .success-box p { font-size: 1rem; }
+            .together-date { font-size: 0.9rem; padding: 8px 18px; }
+            .wechat-tip p { font-size: 0.9rem; }
+        }
+        
+        /* 手机适配 */
+        @media (max-width: 480px) {
+            .year-title { font-size: 1.6rem; }
+            .countdown-display { gap: 6px; flex-wrap: wrap; justify-content: center; }
+            .time-box { padding: 10px 12px; min-width: 60px; }
+            .time-value { font-size: 1.5rem; }
+            .time-label { font-size: 0.8rem; }
+            .final-countdown { font-size: 8rem; }
+            .new-year { font-size: 3rem; }
+            .new-year.move-up { font-size: 1.5rem; top: 3%; }
+            .blessing-popup { padding: 2px 4px; border-radius: 6px; }
+            .blessing-popup .emoji { font-size: 0.7rem; }
+            .blessing-popup .text { font-size: 0.45rem; }
+            .proposal-box { padding: 20px 15px; margin: 10px; border-radius: 20px; }
+            .proposal-box h2 { font-size: 1.2rem; }
+            .proposal-box .question { font-size: 1rem; margin: 15px 0; }
+            .proposal-buttons { gap: 15px; flex-wrap: wrap; }
+            .btn-yes, .btn-no { padding: 10px 25px; font-size: 0.95rem; }
+            .reject-message { font-size: 0.9rem; }
+            .big-heart { font-size: 3rem; }
+            .success-title { font-size: 1.5rem; }
+            .success-box { padding: 15px 18px; margin: 0 10px; border-radius: 20px; }
+            .success-box p { font-size: 0.9rem; line-height: 1.8; }
+            .together-date { font-size: 0.8rem; padding: 8px 15px; margin-top: 15px; }
+            .love-promise { margin-top: 15px; padding-top: 12px; }
+            .love-promise p { font-size: 0.9rem; }
+            .wechat-tip { padding: 12px 15px; margin-top: 15px; }
+            .wechat-tip p { font-size: 0.85rem; }
+        }
+        
+        /* 超小屏手机 */
+        @media (max-width: 360px) {
+            .year-title { font-size: 1.4rem; }
+            .time-box { padding: 8px 10px; min-width: 55px; }
+            .time-value { font-size: 1.3rem; }
+            .final-countdown { font-size: 6rem; }
+            .new-year { font-size: 2.5rem; }
+            .blessing-popup .emoji { font-size: 0.6rem; }
+            .blessing-popup .text { font-size: 0.4rem; }
+            .proposal-box h2 { font-size: 1.1rem; }
+            .proposal-box .question { font-size: 0.95rem; }
+            .success-title { font-size: 1.3rem; }
+            .success-box p { font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 背景音乐 -->
+    <audio id="bgMusic" loop preload="auto">
+        <source src="https://cdn.pixabay.com/audio/2022/10/25/audio_946b0939c8.mp3" type="audio/mpeg">
+    </audio>
+    
+    <!-- 音乐控制按钮 -->
+    <button class="music-btn" id="musicBtn" title="播放/暂停音乐">🎵</button>
+    
+    <div class="stars" id="stars"></div>
+    
+    <!-- 倒计时页面 -->
+    <div class="countdown-page" id="countdownPage">
+        <h1 class="year-title">🎊 2026新年倒计时 🎊</h1>
+        <div class="countdown-display">
+            <div class="time-box">
+                <div class="time-value" id="days">00</div>
+                <div class="time-label">天</div>
+            </div>
+            <div class="time-box">
+                <div class="time-value" id="hours">00</div>
+                <div class="time-label">时</div>
+            </div>
+            <div class="time-box">
+                <div class="time-value" id="minutes">00</div>
+                <div class="time-label">分</div>
+            </div>
+            <div class="time-box">
+                <div class="time-value" id="seconds">00</div>
+                <div class="time-label">秒</div>
+            </div>
+        </div>
+        <p style="color: #ffb6c1; font-size: 1.2rem;">💕 和你一起迎接新年 💕</p>
+    </div>
+    
+    <div class="final-countdown" id="finalCountdown"></div>
+    <div class="new-year" id="newYear">2026</div>
+    
+    <!-- 表白弹窗 -->
+    <div class="proposal-modal" id="proposalModal">
+        <div class="proposal-box">
+            <h2>💕 重要的问题 💕</h2>
+            <p class="question">亲爱的，<br><span class="highlight">你愿意做我的女朋友吗？</span></p>
+            <div class="proposal-buttons">
+                <button class="btn-yes" id="btnYes">愿意 💕</button>
+                <button class="btn-no" id="btnNo">拒绝</button>
+            </div>
+            <p class="reject-message" id="rejectMessage"></p>
+        </div>
+    </div>
+    
+    <!-- 成功页面 -->
+    <div class="success-page" id="successPage">
+        <div class="success-stars" id="successStars"></div>
+        <div class="floating-hearts" id="floatingHearts"></div>
+        <div class="success-content">
+            <div class="big-heart">💕</div>
+            <h1 class="success-title">我们在一起啦</h1>
+            <div class="success-box">
+                <p>从这一刻起</p>
+                <p>你是我的 <span class="highlight">小宝贝</span></p>
+                <p>我是你的 <span class="highlight">专属男友</span></p>
+                <p>往后余生，风雪是你，平淡是你</p>
+                <p>目光所至，也是你 💕</p>
+                <div class="together-date">💑 在一起纪念日：2026年1月1日</div>
+                <div class="love-promise">
+                    <p>🌹 我会永远爱你、宠你、保护你 🌹</p>
+                </div>
+                <div class="wechat-tip">
+                    <p>📱 已向你的微信发送一条爱的消息 💌</p>
+                    <p style="font-size: 0.9rem; margin-top: 5px;">快去查看吧~</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 跨年祝福语（100+条）
+        const blessings = [
+            { emoji: '🎊', text: '新年快乐' }, { emoji: '🎉', text: '万事如意' }, { emoji: '💰', text: '财源滚滚' },
+            { emoji: '🧧', text: '恭喜发财' }, { emoji: '💪', text: '身体健康' }, { emoji: '🎯', text: '心想事成' },
+            { emoji: '💕', text: '爱情甜蜜' }, { emoji: '📈', text: '事业有成' }, { emoji: '🏠', text: '阖家欢乐' },
+            { emoji: '🍀', text: '好运连连' }, { emoji: '🐍', text: '蛇年大吉' }, { emoji: '✨', text: '万事顺遂' },
+            { emoji: '🎁', text: '惊喜不断' }, { emoji: '🌟', text: '前途光明' }, { emoji: '🎆', text: '幸福美满' },
+            { emoji: '💎', text: '富贵吉祥' }, { emoji: '🌈', text: '五彩缤纷' }, { emoji: '🔥', text: '红红火火' },
+            { emoji: '💫', text: '星光璀璨' }, { emoji: '🌸', text: '花开富贵' }, { emoji: '🎶', text: '欢声笑语' },
+            { emoji: '❤️', text: '爱你永远' }, { emoji: '🌙', text: '花好月圆' }, { emoji: '☀️', text: '阳光灿烂' },
+            { emoji: '🎀', text: '美梦成真' }, { emoji: '💗', text: '甜甜蜜蜜' }, { emoji: '🌹', text: '玫瑰绽放' },
+            { emoji: '👑', text: '称心如意' }, { emoji: '🦋', text: '蝶舞翩翩' }, { emoji: '🍫', text: '生活甜蜜' },
+            { emoji: '💖', text: '爱意满满' }, { emoji: '🎇', text: '璀璨夺目' }, { emoji: '🏆', text: '马到成功' },
+            { emoji: '💝', text: '真心相伴' }, { emoji: '🌺', text: '繁花似锦' }, { emoji: '⭐', text: '星辰大海' },
+            { emoji: '🎵', text: '岁月静好' }, { emoji: '💞', text: '相濡以沫' }, { emoji: '🌻', text: '向阳而生' },
+            { emoji: '🍀', text: '四季平安' }, { emoji: '💐', text: '鲜花盛开' }, { emoji: '🎈', text: '快乐无限' },
+            { emoji: '🥂', text: '举杯同庆' }, { emoji: '🎊', text: '喜气洋洋' }, { emoji: '💰', text: '日进斗金' },
+            { emoji: '🧧', text: '红包多多' }, { emoji: '💪', text: '龙马精神' }, { emoji: '🎯', text: '梦想成真' },
+            { emoji: '💕', text: '白头偕老' }, { emoji: '📈', text: '步步高升' }, { emoji: '🏠', text: '家和万事兴' },
+            { emoji: '🍀', text: '福星高照' }, { emoji: '🐍', text: '金蛇献瑞' }, { emoji: '✨', text: '诸事皆宜' },
+            { emoji: '🎁', text: '喜从天降' }, { emoji: '🌟', text: '鹏程万里' }, { emoji: '🎆', text: '团团圆圆' },
+            { emoji: '💎', text: '金玉满堂' }, { emoji: '🌈', text: '绚丽多彩' }, { emoji: '🔥', text: '蒸蒸日上' },
+            { emoji: '💫', text: '光芒万丈' }, { emoji: '🌸', text: '春暖花开' }, { emoji: '🎶', text: '其乐融融' },
+            { emoji: '❤️', text: '幸福永远' }, { emoji: '🌙', text: '月圆人圆' }, { emoji: '☀️', text: '温暖如春' },
+            { emoji: '🎀', text: '如愿以偿' }, { emoji: '💗', text: '恩爱有加' }, { emoji: '🌹', text: '浪漫一生' },
+            { emoji: '👑', text: '大展宏图' }, { emoji: '🦋', text: '自由自在' }, { emoji: '🍫', text: '甜蜜幸福' },
+            { emoji: '💖', text: '真爱永恒' }, { emoji: '🎇', text: '光彩照人' }, { emoji: '🏆', text: '旗开得胜' },
+            { emoji: '💝', text: '情比金坚' }, { emoji: '🌺', text: '锦绣前程' }, { emoji: '⭐', text: '闪闪发光' },
+            { emoji: '🎵', text: '和和美美' }, { emoji: '💞', text: '天长地久' }, { emoji: '🌻', text: '朝气蓬勃' },
+            { emoji: '🍀', text: '吉祥如意' }, { emoji: '💐', text: '花团锦簇' }, { emoji: '🎈', text: '开心每天' },
+            { emoji: '🥂', text: '共度良宵' }, { emoji: '🎊', text: '欢天喜地' }, { emoji: '💰', text: '财运亨通' },
+            { emoji: '🧧', text: '大吉大利' }, { emoji: '💪', text: '百病不侵' }, { emoji: '🎯', text: '万事亨通' },
+            { emoji: '💕', text: '执子之手' }, { emoji: '📈', text: '前程似锦' }, { emoji: '🏠', text: '温馨美满' },
+            { emoji: '🍀', text: '吉星高照' }, { emoji: '🐍', text: '蛇年行大运' }, { emoji: '✨', text: '一帆风顺' },
+            { emoji: '🎁', text: '好事连连' }, { emoji: '🌟', text: '大展鸿图' }, { emoji: '🎆', text: '美满幸福' },
+            { emoji: '💎', text: '珠光宝气' }, { emoji: '🌈', text: '七彩人生' }, { emoji: '🔥', text: '热情似火' },
+            { emoji: '💫', text: '熠熠生辉' }, { emoji: '🌸', text: '桃花朵朵' }, { emoji: '🎶', text: '笑口常开' },
+            { emoji: '❤️', text: '一生一世' }, { emoji: '🌙', text: '皓月当空' }, { emoji: '☀️', text: '晴空万里' },
+            { emoji: '🎀', text: '心愿达成' }, { emoji: '💗', text: '蜜里调油' }, { emoji: '🌹', text: '情深意浓' }
+        ];
+        
+        // 创建星空
+        function createStars() {
+            const container = document.getElementById('stars');
+            for (let i = 0; i < 150; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = Math.random() * 3 + 1 + 'px';
+                star.style.height = star.style.width;
+                star.style.animationDelay = Math.random() * 2 + 's';
+                container.appendChild(star);
+            }
+        }
+        createStars();
+
+        // 创建烟花
+        function createFirework(x, y) {
+            const firework = document.createElement('div');
+            firework.className = 'firework';
+            firework.style.left = x + 'px';
+            firework.style.top = y + 'px';
+            const colors = ['#ff6b9d', '#ff8a80', '#ffab91', '#f48fb1', '#ce93d8', '#ffb6c1', '#ffd700'];
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'firework-particle';
+                const angle = (i / 20) * 360;
+                const velocity = 40 + Math.random() * 60;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.background = color;
+                particle.style.boxShadow = `0 0 6px ${color}`;
+                const rad = angle * Math.PI / 180;
+                const endX = Math.cos(rad) * velocity;
+                const endY = Math.sin(rad) * velocity;
+                particle.animate([
+                    { transform: 'translate(0, 0)', opacity: 1 },
+                    { transform: `translate(${endX}px, ${endY}px)`, opacity: 0 }
+                ], { duration: 1000, easing: 'ease-out' });
+                firework.appendChild(particle);
+            }
+            document.body.appendChild(firework);
+            setTimeout(() => firework.remove(), 1000);
+        }
+        
+        // 创建爱心飘落
+        function createHeartRain() {
+            const hearts = ['💕', '💗', '💖', '💝', '❤️', '💓', '💞', '🌸', '✨'];
+            const heart = document.createElement('div');
+            heart.className = 'heart-rain';
+            heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+            heart.style.left = Math.random() * 100 + '%';
+            heart.style.top = '-30px';
+            heart.style.fontSize = (1 + Math.random() * 1.5) + 'rem';
+            heart.style.animationDuration = (4 + Math.random() * 3) + 's';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 7000);
+        }
+        
+        // 生成爱心形状坐标（支持100+点）
+        function getHeartPositions(count) {
+            const positions = [];
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            const scale = Math.min(window.innerWidth, window.innerHeight) * 0.42;
+            for (let i = 0; i < count; i++) {
+                const t = (i / count) * Math.PI * 2;
+                const x = 16 * Math.pow(Math.sin(t), 3);
+                const y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
+                positions.push({
+                    x: centerX + (x / 16) * scale - 35,
+                    y: centerY + (y / 16) * scale - 25
+                });
+            }
+            return positions;
+        }
+        
+        // 创建祝福弹窗
+        function createBlessingPopup(blessing, pos, delay) {
+            setTimeout(() => {
+                const popup = document.createElement('div');
+                popup.className = 'blessing-popup';
+                popup.style.left = pos.x + 'px';
+                popup.style.top = pos.y + 'px';
+                popup.innerHTML = `<span class="emoji">${blessing.emoji}</span><span class="text">${blessing.text}</span>`;
+                document.body.appendChild(popup);
+            }, delay);
+        }
+        
+        // 北京时间倒计时
+        // 目标时间：北京时间2026年1月1日0点
+        const targetDate = new Date('2026-01-01T00:00:00+08:00');
+        let countdownEnded = false;
+        let lastSecond = -1;
+        let finalCountdownStarted = false;
+        
+        function updateCountdown() {
+            const now = new Date();
+            const diff = targetDate.getTime() - now.getTime();
+            
+            if (diff <= 0 && !countdownEnded) {
+                countdownEnded = true;
+                startNewYear();
+                return;
+            }
+            
+            if (diff > 0) {
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                document.getElementById('days').textContent = String(days).padStart(2, '0');
+                document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+                document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+                document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+                
+                // 最后10秒大倒计时
+                if (diff <= 10000 && !finalCountdownStarted) {
+                    finalCountdownStarted = true;
+                    document.getElementById('countdownPage').classList.add('hidden');
+                    // 自动播放音乐
+                    playMusic();
+                }
+                
+                // 计算最后10秒内的秒数
+                const finalSeconds = Math.ceil(diff / 1000);
+                if (finalCountdownStarted && finalSeconds !== lastSecond && finalSeconds > 0 && finalSeconds <= 10) {
+                    lastSecond = finalSeconds;
+                    showFinalCountdown(finalSeconds);
+                }
+            }
+        }
+
+        // 显示最后倒计时数字
+        function showFinalCountdown(num) {
+            const el = document.getElementById('finalCountdown');
+            el.textContent = num;
+            el.classList.remove('show');
+            void el.offsetWidth;
+            el.classList.add('show');
+            createFirework(Math.random() * window.innerWidth, Math.random() * window.innerHeight * 0.5);
+        }
+        
+        // 开始新年
+        function startNewYear() {
+            document.getElementById('countdownPage').classList.add('hidden');
+            const newYear = document.getElementById('newYear');
+            newYear.classList.add('show');
+            
+            // 大量烟花
+            for (let i = 0; i < 15; i++) {
+                setTimeout(() => {
+                    createFirework(Math.random() * window.innerWidth, Math.random() * window.innerHeight * 0.6);
+                }, i * 100);
+            }
+            
+            // 2秒后显示爱心弹窗
+            setTimeout(() => {
+                newYear.classList.remove('show');
+                newYear.classList.add('move-up');
+                showBlessings();
+            }, 2000);
+        }
+        
+        // 显示祝福弹窗
+        function showBlessings() {
+            const heartPositions = getHeartPositions(blessings.length);
+            blessings.forEach((blessing, index) => {
+                createBlessingPopup(blessing, heartPositions[index], index * 30);
+            });
+            
+            // 弹窗全部出现后显示表白弹窗
+            setTimeout(() => {
+                document.getElementById('proposalModal').classList.add('show');
+            }, blessings.length * 30 + 1000);
+            
+            // 持续烟花
+            setInterval(() => {
+                createFirework(Math.random() * window.innerWidth, Math.random() * window.innerHeight * 0.6);
+            }, 600);
+            
+            // 爱心飘落
+            setInterval(createHeartRain, 150);
+        }
+        
+        // 启动倒计时
+        setInterval(updateCountdown, 100);
+        updateCountdown();
+        
+        // 测试模式：按 T 键跳到最后10秒
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 't' || e.key === 'T') {
+                if (!countdownEnded) {
+                    document.getElementById('countdownPage').classList.add('hidden');
+                    // 播放音乐
+                    playMusic();
+                    // 模拟10秒倒计时
+                    let count = 10;
+                    const countInterval = setInterval(() => {
+                        if (count > 0) {
+                            showFinalCountdown(count);
+                            count--;
+                        } else {
+                            clearInterval(countInterval);
+                            countdownEnded = true;
+                            startNewYear();
+                        }
+                    }, 1000);
+                }
+            }
+        });
+        
+        // 音乐控制
+        const bgMusic = document.getElementById('bgMusic');
+        const musicBtn = document.getElementById('musicBtn');
+        let musicPlaying = false;
+        
+        function playMusic() {
+            if (!musicPlaying) {
+                bgMusic.play().then(() => {
+                    musicPlaying = true;
+                    musicBtn.textContent = '🎶';
+                    musicBtn.classList.add('playing');
+                }).catch(() => {});
+            }
+        }
+        
+        function toggleMusic() {
+            if (musicPlaying) {
+                bgMusic.pause();
+                musicBtn.textContent = '🎵';
+                musicBtn.classList.remove('playing');
+                musicPlaying = false;
+            } else {
+                playMusic();
+            }
+        }
+        
+        musicBtn.addEventListener('click', toggleMusic);
+        
+        // 用户首次交互后解锁音频播放（浏览器安全策略要求）
+        let audioUnlocked = false;
+        function unlockAudio() {
+            if (!audioUnlocked) {
+                // 静音播放一下解锁音频
+                bgMusic.muted = true;
+                bgMusic.play().then(() => {
+                    bgMusic.pause();
+                    bgMusic.muted = false;
+                    bgMusic.currentTime = 0;
+                    audioUnlocked = true;
+                }).catch(() => {});
+            }
+        }
+        document.addEventListener('click', unlockAudio, { once: true });
+        document.addEventListener('touchstart', unlockAudio, { once: true });
+        
+        // 点击放烟花
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('button') && !e.target.closest('.music-btn')) {
+                createFirework(e.clientX, e.clientY);
+            }
+        });
+        
+        // 拒绝时的话语
+        const rejectMessages = [
+            "不行哦，再想想嘛~ 💕", "人家不接受拒绝的！🥺", "你确定吗？再考虑一下？💗",
+            "拒绝无效！重新选择！😤", "不可以拒绝我！💔", "你忍心拒绝我吗？🥹",
+            "这个按钮坏了，点另一个吧~ 💖", "我不听我不听！💕", "再点一百次也没用哦~ 😘",
+            "你的拒绝我不接受！❤️", "不行不行，必须同意！💗", "我会一直等你点同意的~ 🌹",
+            "拒绝的话我会伤心的... 😢", "给个机会嘛~ 💕", "你看我这么可爱，同意吧！🥰"
+        ];
+        
+        let rejectCount = 0;
+        
+        // 成功页面效果
+        function createSuccessStars() {
+            const container = document.getElementById('successStars');
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = Math.random() * 3 + 1 + 'px';
+                star.style.height = star.style.width;
+                star.style.animationDelay = Math.random() * 2 + 's';
+                container.appendChild(star);
+            }
+        }
+        
+        function createFloatingHearts() {
+            const container = document.getElementById('floatingHearts');
+            const hearts = ['💕', '💗', '💖', '💝', '❤️', '💓', '💞', '🌹', '✨', '💫'];
+            for (let i = 0; i < 25; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'floating-heart';
+                heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.animationDelay = Math.random() * 4 + 's';
+                heart.style.fontSize = (1.5 + Math.random() * 2) + 'rem';
+                container.appendChild(heart);
+            }
+        }
+        
+        // 同意按钮
+        document.getElementById('btnYes').addEventListener('click', () => {
+            document.getElementById('proposalModal').classList.remove('show');
+            document.getElementById('successPage').classList.add('show');
+            createSuccessStars();
+            createFloatingHearts();
+            
+            // 疯狂放烟花
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    createFirework(Math.random() * window.innerWidth, Math.random() * window.innerHeight * 0.7);
+                }, i * 80);
+            }
+            
+            setInterval(() => {
+                createFirework(Math.random() * window.innerWidth, Math.random() * window.innerHeight * 0.5);
+            }, 300);
+            
+            setInterval(createHeartRain, 150);
+        });
+        
+        // 拒绝按钮
+        document.getElementById('btnNo').addEventListener('click', () => {
+            const message = rejectMessages[rejectCount % rejectMessages.length];
+            document.getElementById('rejectMessage').textContent = message;
+            rejectCount++;
+            
+            const btnNo = document.getElementById('btnNo');
+            if (rejectCount > 2) {
+                const randomX = (Math.random() - 0.5) * 100;
+                const randomY = (Math.random() - 0.5) * 50;
+                btnNo.style.transform = `translate(${randomX}px, ${randomY}px)`;
+            }
+            
+            const btnYes = document.getElementById('btnYes');
+            btnYes.style.transform = `scale(${1 + rejectCount * 0.1})`;
+        });
+    </script>
+</body>
+</html>
