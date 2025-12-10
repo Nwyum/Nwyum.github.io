@@ -10,7 +10,7 @@
         /* 音乐控制按钮 */
         .music-btn {
             position: fixed;
-            top: 15px;
+            top: 70px;
             right: 15px;
             width: 45px;
             height: 45px;
@@ -33,57 +33,6 @@
             transform: scale(1.1);
         }
         
-        /* 测试按钮 - 手机端使用 */
-        .test-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, rgba(138, 43, 226, 0.4), rgba(255, 107, 157, 0.4));
-            border: 2px solid rgba(255, 107, 157, 0.6);
-            color: white;
-            font-size: 0.75rem;
-            font-weight: bold;
-            cursor: pointer;
-            z-index: 500;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 2px;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(8px);
-            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.3),
-                        inset 0 0 20px rgba(255, 255, 255, 0.1);
-            animation: testBtnFloat 3s ease-in-out infinite;
-        }
-        
-        .test-btn::before {
-            content: '🚀';
-            font-size: 1.2rem;
-        }
-        
-        .test-btn:hover, .test-btn:active {
-            background: linear-gradient(135deg, rgba(138, 43, 226, 0.6), rgba(255, 107, 157, 0.6));
-            transform: scale(1.15);
-            box-shadow: 0 6px 25px rgba(255, 107, 157, 0.5),
-                        inset 0 0 30px rgba(255, 255, 255, 0.2);
-        }
-        
-        @keyframes testBtnFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
-        
-        .test-btn:hover, .test-btn:active {
-            animation: none;
-        }
-        
-        .test-btn.hidden {
-            display: none;
-        }
         
         .music-btn.playing {
             animation: musicPulse 1s ease-in-out infinite;
@@ -92,6 +41,275 @@
         @keyframes musicPulse {
             0%, 100% { box-shadow: 0 0 10px rgba(255, 107, 157, 0.5); }
             50% { box-shadow: 0 0 25px rgba(255, 107, 157, 0.8); }
+        }
+        
+        /* 爱心接力游戏 */
+        .game-container {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 15;
+            overflow: hidden;
+        }
+        
+        .game-container.active {
+            pointer-events: auto;
+        }
+        
+        .game-ui {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            z-index: 520;
+            pointer-events: none;
+        }
+        
+        .game-score {
+            background: rgba(255, 107, 157, 0.3);
+            backdrop-filter: blur(5px);
+            border: 2px solid rgba(255, 107, 157, 0.6);
+            border-radius: 15px;
+            padding: 8px 15px;
+            color: #ff6b9d;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        
+        .game-score .score-value {
+            font-size: 1.3rem;
+            color: #ffd700;
+        }
+        
+        .game-lives {
+            background: rgba(255, 107, 157, 0.3);
+            backdrop-filter: blur(5px);
+            border: 2px solid rgba(255, 107, 157, 0.6);
+            border-radius: 15px;
+            padding: 8px 15px;
+            font-size: 1.2rem;
+        }
+        
+        .game-hint {
+            position: fixed;
+            bottom: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 107, 157, 0.2);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 107, 157, 0.4);
+            border-radius: 20px;
+            padding: 8px 20px;
+            color: #ffb6c1;
+            font-size: 0.85rem;
+            z-index: 520;
+            animation: hintPulse 2s ease-in-out infinite;
+            text-align: center;
+            max-width: 90%;
+        }
+        
+        @keyframes hintPulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+        
+        /* 爱心篮子 */
+        .heart-catcher {
+            position: absolute;
+            bottom: 30px;
+            width: 80px;
+            height: 60px;
+            font-size: 3rem;
+            text-align: center;
+            line-height: 60px;
+            z-index: 18;
+            transition: left 0.05s linear;
+            filter: drop-shadow(0 0 15px rgba(255, 107, 157, 0.8));
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        
+        .heart-catcher::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70px;
+            height: 8px;
+            background: linear-gradient(90deg, transparent, rgba(255, 107, 157, 0.6), transparent);
+            border-radius: 50%;
+        }
+        
+        /* 掉落的爱心 */
+        .falling-heart {
+            position: absolute;
+            font-size: 1.8rem;
+            user-select: none;
+            filter: drop-shadow(0 0 8px rgba(255, 107, 157, 0.8));
+            z-index: 16;
+            pointer-events: none;
+        }
+        
+        .falling-heart.special {
+            font-size: 2.2rem;
+            filter: drop-shadow(0 0 15px rgba(255, 215, 0, 1));
+            animation: specialGlow 0.5s ease-in-out infinite alternate;
+        }
+        
+        @keyframes specialGlow {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+        
+        .falling-heart.caught {
+            animation: heartCaught 0.3s ease-out forwards;
+        }
+        
+        @keyframes heartCaught {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.8; }
+            100% { transform: scale(0); opacity: 0; }
+        }
+        
+        .falling-heart.missed {
+            animation: heartMissed 0.3s ease-out forwards;
+        }
+        
+        @keyframes heartMissed {
+            0% { opacity: 1; }
+            100% { opacity: 0; transform: translateY(20px); }
+        }
+        
+        /* 炸弹 */
+        .falling-bomb {
+            position: absolute;
+            font-size: 2rem;
+            user-select: none;
+            z-index: 16;
+            pointer-events: none;
+            animation: bombShake 0.3s ease-in-out infinite;
+        }
+        
+        @keyframes bombShake {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+        
+        .falling-bomb.explode {
+            animation: bombExplode 0.4s ease-out forwards;
+        }
+        
+        @keyframes bombExplode {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(2); opacity: 0.8; }
+            100% { transform: scale(0); opacity: 0; }
+        }
+        
+        .score-popup {
+            position: fixed;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #ffd700;
+            pointer-events: none;
+            z-index: 530;
+            animation: scoreFloat 0.8s ease-out forwards;
+        }
+        
+        .score-popup.negative {
+            color: #ff4444;
+        }
+        
+        @keyframes scoreFloat {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-50px); opacity: 0; }
+        }
+        
+        .combo-text {
+            position: fixed;
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+            pointer-events: none;
+            z-index: 540;
+            animation: comboShow 0.8s ease-out forwards;
+        }
+        
+        @keyframes comboShow {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            30% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+        }
+        
+        /* 游戏结束弹窗 */
+        .game-over-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, rgba(255, 107, 157, 0.3), rgba(138, 43, 226, 0.3));
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255, 107, 157, 0.6);
+            border-radius: 25px;
+            padding: 25px 35px;
+            text-align: center;
+            z-index: 550;
+            display: none;
+        }
+        
+        .game-over-popup.show {
+            display: block;
+            animation: popupIn 0.4s ease;
+        }
+        
+        @keyframes popupIn {
+            from { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        
+        .game-over-popup h3 {
+            color: #ff6b9d;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .game-over-popup .final-score {
+            font-size: 2.5rem;
+            color: #ffd700;
+            margin: 15px 0;
+        }
+        
+        .game-over-popup .restart-btn {
+            background: linear-gradient(45deg, #ff6b9d, #ff8a80);
+            border: none;
+            padding: 12px 30px;
+            font-size: 1rem;
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: transform 0.2s;
+        }
+        
+        .game-over-popup .restart-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        @media (max-width: 480px) {
+            .heart-catcher { width: 70px; font-size: 2.5rem; bottom: 25px; }
+            .game-hint { font-size: 0.75rem; bottom: 100px; }
+            .game-score { padding: 6px 12px; font-size: 0.8rem; }
+            .game-score .score-value { font-size: 1.1rem; }
+            .game-lives { padding: 6px 12px; font-size: 1rem; }
+            .combo-text { font-size: 1.5rem; }
         }
         
         body {
@@ -510,19 +728,92 @@
             .success-title { font-size: 1.3rem; }
             .success-box p { font-size: 0.85rem; }
         }
+        
+        /* 欢迎界面 */
+        .welcome-screen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 50%, #1a0a2e 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            cursor: pointer;
+        }
+        
+        .welcome-screen.hidden {
+            display: none;
+        }
+        
+        .welcome-title {
+            font-size: 2.5rem;
+            color: #ff6b9d;
+            text-shadow: 0 0 30px rgba(255, 107, 157, 0.8);
+            margin-bottom: 20px;
+            animation: welcomePulse 2s ease-in-out infinite;
+        }
+        
+        .welcome-subtitle {
+            font-size: 1.2rem;
+            color: #ffb6c1;
+            margin-bottom: 40px;
+        }
+        
+        .welcome-btn {
+            background: linear-gradient(45deg, #ff6b9d, #ff8a80);
+            border: none;
+            padding: 15px 50px;
+            font-size: 1.3rem;
+            color: white;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 30px rgba(255, 107, 157, 0.5);
+            animation: welcomePulse 2s ease-in-out infinite;
+            transition: transform 0.3s;
+        }
+        
+        .welcome-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        @keyframes welcomePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .welcome-hint {
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: rgba(255, 182, 193, 0.7);
+        }
+        
+        @media (max-width: 480px) {
+            .welcome-title { font-size: 1.8rem; }
+            .welcome-subtitle { font-size: 1rem; }
+            .welcome-btn { padding: 12px 40px; font-size: 1.1rem; }
+        }
     </style>
 </head>
 <body>
+    <!-- 欢迎界面 -->
+    <div class="welcome-screen" id="welcomeScreen">
+        <div class="welcome-title">💕 给你的惊喜 💕</div>
+        <div class="welcome-subtitle">准备好了吗？</div>
+        <button class="welcome-btn" id="enterBtn">点击进入 ✨</button>
+        <div class="welcome-hint">🎵 请打开声音获得最佳体验</div>
+    </div>
+
     <!-- 背景音乐 -->
     <audio id="bgMusic" loop preload="auto">
-        <source src="https://cdn.pixabay.com/audio/2022/10/25/audio_946b0939c8.mp3" type="audio/mpeg">
+        <source src="Taylor Swift - Love Story (The 1989 World Tour Live)_L.ogg" type="audio/ogg">
     </audio>
     
     <!-- 音乐控制按钮 -->
     <button class="music-btn" id="musicBtn" title="播放/暂停音乐">🎵</button>
     
-    <!-- 测试按钮 - 手机端点击触发测试 -->
-    <button class="test-btn" id="testBtn" title="测试模式">预览</button>
+
     
     <div class="stars" id="stars"></div>
     
@@ -548,6 +839,25 @@
             </div>
         </div>
         <p style="color: #ffb6c1; font-size: 1.2rem;">💕 和你一起迎接新年 💕</p>
+    </div>
+    
+    <!-- 爱心接力游戏 -->
+    <div class="game-container active" id="gameContainer">
+        <div class="game-ui">
+            <div class="game-score">爱心: <span class="score-value" id="gameScore">0</span></div>
+            <div class="game-lives" id="gameLives">&#10084;&#10084;&#10084;</div>
+        </div>
+        <div class="game-hint">&#128070; 滑动屏幕移动篮子接住爱心<br>&#9888; 躲开炸弹!</div>
+        <div class="heart-catcher" id="heartCatcher">&#128230;</div>
+    </div>
+    
+    <!-- 游戏结束弹窗 -->
+    <div class="game-over-popup" id="gameOverPopup">
+        <h3>游戏结束</h3>
+        <div>你收集了</div>
+        <div class="final-score" id="finalGameScore">0</div>
+        <div>个爱心!</div>
+        <button class="restart-btn" id="restartBtn">再玩一次</button>
     </div>
     
     <div class="final-countdown" id="finalCountdown"></div>
@@ -649,6 +959,283 @@
         }
         createStars();
 
+        // ========== 爱心接力游戏 ==========
+        let gameScore = 0;
+        let gameLives = 3;
+        let combo = 0;
+        let lastCatchTime = 0;
+        let gameActive = true;
+        let gameSpeed = 3000; // 下落速度（毫秒）
+        let spawnRate = 1200; // 生成间隔
+        
+        const gameHearts = ['\u2764', '\u2665', '\u2661', '\u2763', '\u2766', '\u2767', '\u2619'];
+        const specialHearts = ['\u2605', '\u2606', '\u2736', '\u272A', '\u2730'];
+        const catcher = document.getElementById('heartCatcher');
+        const gameContainer = document.getElementById('gameContainer');
+        let catcherX = window.innerWidth / 2 - 40;
+        catcher.style.left = catcherX + 'px';
+        
+        // 触摸/鼠标控制篮子
+        let isDragging = false;
+        let touchStartX = 0;
+        let catcherStartX = 0;
+        
+        function moveCatcher(clientX) {
+            const newX = Math.max(0, Math.min(window.innerWidth - 80, clientX - 40));
+            catcherX = newX;
+            catcher.style.left = newX + 'px';
+        }
+        
+        // 触摸事件
+        gameContainer.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            touchStartX = e.touches[0].clientX;
+            catcherStartX = catcherX;
+        }, { passive: true });
+        
+        gameContainer.addEventListener('touchmove', (e) => {
+            if (!isDragging || !gameActive) return;
+            const deltaX = e.touches[0].clientX - touchStartX;
+            moveCatcher(catcherStartX + deltaX + 40);
+        }, { passive: true });
+        
+        gameContainer.addEventListener('touchend', () => { isDragging = false; });
+        
+        // 鼠标事件（电脑端）
+        gameContainer.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            touchStartX = e.clientX;
+            catcherStartX = catcherX;
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging || !gameActive) return;
+            moveCatcher(e.clientX);
+        });
+        
+        document.addEventListener('mouseup', () => { isDragging = false; });
+        
+        // 陀螺仪控制（手机倾斜）
+        if (window.DeviceOrientationEvent) {
+            window.addEventListener('deviceorientation', (e) => {
+                if (!gameActive || isDragging) return;
+                const tilt = e.gamma; // -90 到 90
+                if (tilt !== null) {
+                    const sensitivity = 3;
+                    const newX = catcherX + tilt * sensitivity * 0.1;
+                    moveCatcher(Math.max(0, Math.min(window.innerWidth - 80, newX)) + 40);
+                }
+            });
+        }
+        
+        // 掉落物品数组
+        let fallingItems = [];
+        
+        function createFallingItem() {
+            if (!gameActive) return;
+            
+            // 15%概率生成炸弹，15%概率生成特殊爱心
+            const rand = Math.random();
+            const isBomb = rand < 0.15;
+            const isSpecial = !isBomb && rand < 0.30;
+            
+            const item = document.createElement('div');
+            item.className = isBomb ? 'falling-bomb' : 'falling-heart';
+            
+            if (isBomb) {
+                item.textContent = '\u2620'; // 骷髅符号代替炸弹
+                item.dataset.type = 'bomb';
+            } else if (isSpecial) {
+                item.textContent = specialHearts[Math.floor(Math.random() * specialHearts.length)];
+                item.dataset.type = 'special';
+                item.classList.add('special');
+            } else {
+                item.textContent = gameHearts[Math.floor(Math.random() * gameHearts.length)];
+                item.dataset.type = 'normal';
+            }
+            
+            const startX = 30 + Math.random() * (window.innerWidth - 80);
+            item.style.left = startX + 'px';
+            item.style.top = '-50px';
+            
+            gameContainer.appendChild(item);
+            
+            // 下落动画数据
+            const itemData = {
+                element: item,
+                x: startX,
+                y: -50,
+                speed: (2 + Math.random() * 2) * (1 + gameScore / 100), // 随分数加速
+                type: item.dataset.type
+            };
+            fallingItems.push(itemData);
+        }
+        
+        // 游戏主循环
+        function gameLoop() {
+            if (!gameActive) return;
+            
+            const catcherRect = {
+                left: catcherX + 10,
+                right: catcherX + 70,
+                top: window.innerHeight - 90,
+                bottom: window.innerHeight - 30
+            };
+            
+            fallingItems = fallingItems.filter(item => {
+                item.y += item.speed;
+                item.element.style.top = item.y + 'px';
+                
+                const itemRect = {
+                    left: item.x,
+                    right: item.x + 40,
+                    top: item.y,
+                    bottom: item.y + 40
+                };
+                
+                // 碰撞检测
+                const collision = !(itemRect.right < catcherRect.left || 
+                                   itemRect.left > catcherRect.right || 
+                                   itemRect.bottom < catcherRect.top || 
+                                   itemRect.top > catcherRect.bottom);
+                
+                if (collision) {
+                    if (item.type === 'bomb') {
+                        // 碰到炸弹
+                        item.element.classList.add('explode');
+                        loseLife();
+                        showScorePopup(item.x, item.y, 'BOOM!', true);
+                        combo = 0;
+                    } else {
+                        // 接住爱心
+                        item.element.classList.add('caught');
+                        const now = Date.now();
+                        if (now - lastCatchTime < 800) combo++;
+                        else combo = 1;
+                        lastCatchTime = now;
+                        
+                        let points = item.type === 'special' ? 5 : 1;
+                        if (combo >= 10) points *= 3;
+                        else if (combo >= 5) points *= 2;
+                        
+                        gameScore += points;
+                        document.getElementById('gameScore').textContent = gameScore;
+                        showScorePopup(item.x, item.y, '+' + points);
+                        
+                        if (combo === 5) showComboText('5连击! x2');
+                        else if (combo === 10) showComboText('10连击! x3');
+                        else if (combo === 20) showComboText('超神!');
+                    }
+                    setTimeout(() => item.element.remove(), 300);
+                    return false;
+                }
+                
+                // 掉出屏幕
+                if (item.y > window.innerHeight) {
+                    if (item.type !== 'bomb') {
+                        // 漏掉爱心
+                        item.element.classList.add('missed');
+                        combo = 0;
+                    }
+                    setTimeout(() => item.element.remove(), 300);
+                    return false;
+                }
+                
+                return true;
+            });
+            
+            requestAnimationFrame(gameLoop);
+        }
+        
+        function loseLife() {
+            gameLives--;
+            updateLivesDisplay();
+            
+            // 屏幕震动效果
+            gameContainer.style.animation = 'none';
+            gameContainer.offsetHeight;
+            gameContainer.style.animation = 'shake 0.3s ease';
+            
+            if (gameLives <= 0) {
+                endGame();
+            }
+        }
+        
+        function updateLivesDisplay() {
+            const livesEl = document.getElementById('gameLives');
+            livesEl.innerHTML = '\u2764'.repeat(gameLives) + '\u2661'.repeat(3 - gameLives);
+        }
+        
+        function showScorePopup(x, y, text, isNegative = false) {
+            const popup = document.createElement('div');
+            popup.className = 'score-popup' + (isNegative ? ' negative' : '');
+            popup.textContent = text;
+            popup.style.left = x + 'px';
+            popup.style.top = y + 'px';
+            document.body.appendChild(popup);
+            setTimeout(() => popup.remove(), 800);
+        }
+        
+        function showComboText(text) {
+            const comboEl = document.createElement('div');
+            comboEl.className = 'combo-text';
+            comboEl.textContent = text;
+            document.body.appendChild(comboEl);
+            setTimeout(() => comboEl.remove(), 800);
+        }
+        
+        function endGame() {
+            gameActive = false;
+            clearInterval(gameInterval);
+            document.getElementById('finalGameScore').textContent = gameScore;
+            document.getElementById('gameOverPopup').classList.add('show');
+        }
+        
+        function restartGame() {
+            gameScore = 0;
+            gameLives = 3;
+            combo = 0;
+            gameActive = true;
+            document.getElementById('gameScore').textContent = '0';
+            updateLivesDisplay();
+            document.getElementById('gameOverPopup').classList.remove('show');
+            
+            // 清除所有掉落物
+            fallingItems.forEach(item => item.element.remove());
+            fallingItems = [];
+            
+            gameInterval = setInterval(createFallingItem, spawnRate);
+            gameLoop();
+        }
+        
+        document.getElementById('restartBtn').addEventListener('click', restartGame);
+        
+        // 添加震动动画
+        const shakeStyle = document.createElement('style');
+        shakeStyle.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-10px); }
+                75% { transform: translateX(10px); }
+            }
+        `;
+        document.head.appendChild(shakeStyle);
+        
+        // 启动游戏
+        let gameInterval = setInterval(createFallingItem, spawnRate);
+        gameLoop();
+        
+        // 游戏停止函数（倒计时结束时调用）
+        function stopGame() {
+            gameActive = false;
+            clearInterval(gameInterval);
+            const container = document.getElementById('gameContainer');
+            container.classList.remove('active');
+            container.style.display = 'none';
+            document.getElementById('gameOverPopup').classList.remove('show');
+        }
+        // ========== 游戏结束 ==========
+
         // 创建烟花
         function createFirework(x, y) {
             const firework = document.createElement('div');
@@ -722,7 +1309,7 @@
         }
         
         // 北京时间倒计时
-        // 目标时间：北京时间2026年1月1日0点
+        // 目标时间：北京时间2026年1月1日00点00分
         const targetDate = new Date('2026-01-01T00:00:00+08:00');
         let countdownEnded = false;
         let lastSecond = -1;
@@ -779,6 +1366,7 @@
         // 开始新年
         function startNewYear() {
             document.getElementById('countdownPage').classList.add('hidden');
+            stopGame(); // 停止爱心收集游戏
             const newYear = document.getElementById('newYear');
             newYear.classList.add('show');
             
@@ -826,7 +1414,6 @@
         function startTestMode() {
             if (!countdownEnded) {
                 document.getElementById('countdownPage').classList.add('hidden');
-                document.getElementById('testBtn').classList.add('hidden'); // 隐藏测试按钮
                 // 播放音乐
                 playMusic();
                 // 模拟10秒倒计时
@@ -851,9 +1438,6 @@
             }
         });
         
-        // 测试按钮点击（手机端）
-        document.getElementById('testBtn').addEventListener('click', startTestMode);
-        
         // 音乐控制
         const bgMusic = document.getElementById('bgMusic');
         const musicBtn = document.getElementById('musicBtn');
@@ -861,6 +1445,7 @@
         
         function playMusic() {
             if (!musicPlaying) {
+                bgMusic.currentTime = 52; // 从52秒开始播放
                 bgMusic.play().then(() => {
                     musicPlaying = true;
                     musicBtn.textContent = '🎶';
@@ -882,22 +1467,22 @@
         
         musicBtn.addEventListener('click', toggleMusic);
         
-        // 用户首次交互后解锁音频播放（浏览器安全策略要求）
-        let audioUnlocked = false;
-        function unlockAudio() {
-            if (!audioUnlocked) {
-                // 静音播放一下解锁音频
-                bgMusic.muted = true;
-                bgMusic.play().then(() => {
-                    bgMusic.pause();
-                    bgMusic.muted = false;
-                    bgMusic.currentTime = 0;
-                    audioUnlocked = true;
-                }).catch(() => {});
-            }
+        // 欢迎界面 - 点击进入并播放音乐
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const enterBtn = document.getElementById('enterBtn');
+        
+        function enterPage() {
+            // 隐藏欢迎界面
+            welcomeScreen.classList.add('hidden');
+            // 播放音乐
+            playMusic();
         }
-        document.addEventListener('click', unlockAudio, { once: true });
-        document.addEventListener('touchstart', unlockAudio, { once: true });
+        
+        // 点击按钮或整个欢迎界面都可以进入
+        enterBtn.addEventListener('click', enterPage);
+        welcomeScreen.addEventListener('click', enterPage);
+        // 手机触摸支持
+        welcomeScreen.addEventListener('touchstart', enterPage, { once: true });
         
         // 点击放烟花
         document.addEventListener('click', (e) => {
